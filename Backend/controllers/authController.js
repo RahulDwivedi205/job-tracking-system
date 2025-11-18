@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // You will likely need this for matchPassword
 const { validationResult } = require('express-validator');
 
-// --- FIXED generateToken function ---
-// It now accepts 'role' and adds it to the JWT payload
+
 const generateToken = (id, role) => {
     const payload = { id, role };
     return jwt.sign(payload, process.env.JWT_SECRET, {
@@ -12,7 +11,7 @@ const generateToken = (id, role) => {
     });
 };
 
-// @desc    Register a new user
+
 exports.registerUser = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -29,7 +28,7 @@ exports.registerUser = async (req, res) => {
 
         user = await User.create({ name, email, password, role });
 
-        // FIX: Pass both the ID and the role to generate the token
+
         const token = generateToken(user._id, user.role);
 
         res.status(201).json({
@@ -45,7 +44,7 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-// @desc    Authenticate user & get token
+
 exports.loginUser = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -55,11 +54,10 @@ exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // I assume you have a user model with a matchPassword method
-        // Also, fetch the password which might be excluded by default
+
         const user = await User.findOne({ email }).select('+password');
 
-        // You likely need bcrypt to compare passwords
+
         if (user && (await bcrypt.compare(password, user.password))) {
             // FIX: Pass both the ID and the role to generate the token
             const token = generateToken(user._id, user.role);

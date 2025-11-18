@@ -12,7 +12,7 @@ const { protect, admin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// All routes here are protected and require a valid token
+
 router.use(protect);
 
 router.route('/')

@@ -2,7 +2,6 @@ const Job = require('../models/Job');
 const { validationResult } = require('express-validator');
 const { sendNotification } = require('../services/notificationService');
 
-// @desc    Get all jobs for a logged-in user (with filters)
 exports.getJobs = async (req, res) => {
     const { status, sortBy } = req.query;
     const query = { user: req.user.id };
@@ -24,7 +23,7 @@ exports.getJobs = async (req, res) => {
     }
 };
 
-// @desc    Get a single job by ID
+
 exports.getJobById = async (req, res) => {
     try {
         const job = await Job.findById(req.params.id);
@@ -97,7 +96,6 @@ exports.updateJob = async (req, res) => {
     }
 };
 
-// @desc    Delete a job application
 exports.deleteJob = async (req, res) => {
     try {
         const job = await Job.findById(req.params.id);
@@ -117,8 +115,7 @@ exports.deleteJob = async (req, res) => {
 
 exports.getAllJobsForAdmin = async (req, res) => {
     try {
-        // The query object is empty, so it fetches all jobs
-        // We populate the 'user' field, selecting only their name and email
+
         const jobs = await Job.find({}).populate('user', 'name email').sort({ createdAt: -1 });
         res.json(jobs);
     } catch (error) {
@@ -136,16 +133,12 @@ exports.deleteJob = async (req, res) => {
             return res.status(404).json({ message: 'Job not found' });
         }
 
-        // Now, check for authorization.
-        // The user is authorized if:
-        // 1. They are an admin.
-        // OR
-        // 2. They are the user who created the job post.
+        
         if (req.user.role === "admin" || job.user.toString() === req.user.id) {
             await Job.deleteOne({ _id: req.params.id });
             res.json({ message: 'Job application removed successfully' });
         } else {
-            // If neither condition is met, they are not authorized.
+
             res.status(401).json({ message: 'User not authorized to delete this job' });
         }
     } catch (error) {
